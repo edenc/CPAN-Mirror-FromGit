@@ -1,0 +1,6 @@
+use warnings;
+use strict;
+
+use CPAN::Mirror::FromGit;
+
+my $cmgit = CPAN::Mirror::FromGit->new;
