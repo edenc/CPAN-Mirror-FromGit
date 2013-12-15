@@ -10,7 +10,7 @@ use PPI;
 sub checkout {
   my($self, $repo) = @_;
   my $curdir = Cwd::getcwd();
-  my $tmpdir = File::Temp::tempdir(CLEANUP => 1);
+  my $tmpdir = File::Temp::tempdir();
   chdir($tmpdir);
   my $ts = time();
   system(qq{git clone $repo $ts});
@@ -27,13 +27,16 @@ sub scan_repo {
     callback => sub {
       my ($file) = @_;
       return unless $file && -f $file;
-      my $doc = PPI::Document->new($file);
+      return if $file =~ /\.git/;
+      my $doc = PPI::Document->new( $file . '' ) or return;
       my $local_pkgs =
         $doc->find(
         sub { $_[1]->isa('PPI::Statement::Package') and $_[1]->namespace } );
-      push @packages, @$local_pkgs;
+      push @packages, map { $_->namespace } @$local_pkgs if $local_pkgs;
     }
   );
+  # TODO identify versions
+  return map { $_ => undef } @packages;
 }
 
 1;
