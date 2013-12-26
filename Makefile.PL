@@ -21,7 +21,9 @@ my %WriteMakefileArgs = (
   ],
   "LICENSE" => "perl",
   "NAME" => "CPAN::Mirror::FromGit",
-  "PREREQ_PM" => {},
+  "PREREQ_PM" => {
+    "MooseX::ConfigFromFile" => 0
+  },
   "TEST_REQUIRES" => {},
   "VERSION" => "0.001",
   "test" => {
@@ -30,7 +32,9 @@ my %WriteMakefileArgs = (
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "MooseX::ConfigFromFile" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
