@@ -1,6 +1,41 @@
+#!/usr/bin/env perl
 use warnings;
 use strict;
 
+use App::cpanminus::fatscript;
 use CPAN::Mirror::FromGit;
 
-my $cmgit = CPAN::Mirror::FromGit->new;
+{
+
+  package App::cpanminus::script::withgit;
+  use Moose;
+  extends 'App::cpanminus::script';
+
+  my $cmfg =
+    CPAN::Mirror::FromGit->new_with_config(
+    configfile => CPAN::Mirror::FromGit->_get_default_config_file );
+
+  override resolve_name => sub {
+    my ( $self, $module, $version, $allow_file ) = @_;
+    my $index = $cmfg->module_index;
+    $cmfg->chat("Found module $module in git index\n"),
+      return $self->git_uri( $index->{$module} )
+      if exists $index->{$module};
+    super();
+  };
+
+  override build_args_handlers => sub {
+    my ($self) = @_;
+    return 'gitindex' => sub { $self->{action} = 'gitindex' },
+      super();
+  };
+
+  sub gitindex { $cmfg->write_repo_index }
+
+}
+
+unless (caller) {
+  my $app = App::cpanminus::script::withgit->new;
+  $app->parse_options(@ARGV);
+  exit $app->doit;
+}

@@ -13,8 +13,9 @@ use YAML ();
 with 'MooseX::ConfigFromFile';
 
 sub _get_default_config_file {
-  my $home = File::HomeDir->my_home;
-  my $file = qq{$home/.cpangit};
+  my ($class) = @_;
+  my $home    = $class->_build_home_dir;
+  my $file    = qq{$home/config.yaml};
   open( my ($fh), '>', $file ) || die qq{Couldn't open $file: $!}
     unless -f $file;
   return $file;
@@ -25,7 +26,7 @@ sub get_config_from_file {
   return YAML::LoadFile($file);
 }
 
-has repos => ( isa => 'ArrayRef', is => 'ro', required => 1 );
+has repos => ( isa => 'ArrayRef', is => 'ro', default => sub { [] } );
 
 has home_dir => ( isa => 'Str', is => 'ro', required => 1, lazy_build => 1 );
 
@@ -100,8 +101,10 @@ sub build_repo_index {
   my @repos = $self->get_repo_list;
   my %index;
   for my $repo (@repos) {
+    $self->chat("Building module index for $repo\n");
     my %pkgs = $self->scan_repo($repo);
-    $index{$_} = $repo for keys %pkgs;
+    $self->chat("Found modules:\n");
+    $self->chat("$_\n"), $index{$_} = $repo for keys %pkgs;
   }
   return %index;
 }
@@ -110,6 +113,12 @@ sub write_repo_index {
   my ($self) = @_;
   my %index = $self->build_repo_index;
   YAML::DumpFile( $self->module_index_file, \%index );
+}
+
+sub chat {
+    my $self = shift;
+    print STDERR @_;
+#    $self->log(@_);
 }
 
 1;
