@@ -117,8 +117,10 @@ sub write_repo_index {
 
 sub chat {
     my $self = shift;
-    print STDERR @_;
+    print STDERR @_ if $self->debug;
 #    $self->log(@_);
 }
+
+sub debug { $ENV{DEBUG} }
 
 1;

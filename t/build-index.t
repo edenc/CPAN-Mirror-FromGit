@@ -16,17 +16,32 @@ my $cmgit = CPAN::Mirror::FromGit->new_with_config(
 );
 my %modules = $cmgit->scan_repo($repo);
 
-is_deeply( \%modules, { 'CPAN::Mirror::FromGit' => undef } );
+is_deeply(
+  \%modules,
+  { 'CPAN::Mirror::FromGit'           => undef,
+    'App::cpanminus::script::withgit' => undef
+  }
+);
 
 my %index = $cmgit->build_repo_index;
 
-is_deeply( \%index,
-  { 'CPAN::Mirror::FromGit' => "file:///${FindBin::Bin}/../.git" } );
+is_deeply(
+  \%index,
+  { 'CPAN::Mirror::FromGit' => "file:///${FindBin::Bin}/../.git",
+    'App::cpanminus::script::withgit' =>
+      'file:////Users/edenc/src/CPAN-Mirror-FromGit/t/../.git'
+  }
+);
 
 $cmgit->write_repo_index;
 
-is_deeply( YAML::LoadFile( $cmgit->module_index_file ),
-  { 'CPAN::Mirror::FromGit' => "file:///${FindBin::Bin}/../.git" } );
+is_deeply(
+  YAML::LoadFile( $cmgit->module_index_file ),
+  { 'CPAN::Mirror::FromGit' => "file:///${FindBin::Bin}/../.git",
+    'App::cpanminus::script::withgit' =>
+      'file:////Users/edenc/src/CPAN-Mirror-FromGit/t/../.git'
+  }
+);
 
 unlink $cmgit->module_index_file;
 
