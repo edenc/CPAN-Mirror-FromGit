@@ -29,7 +29,7 @@ is_deeply(
   \%index,
   { 'CPAN::Mirror::FromGit' => "file:///${FindBin::Bin}/../.git",
     'App::cpanminus::script::withgit' =>
-      'file:////Users/edenc/src/CPAN-Mirror-FromGit/t/../.git'
+      "file:///${FindBin::Bin}/../.git"
   }
 );
 
@@ -39,7 +39,7 @@ is_deeply(
   YAML::LoadFile( $cmgit->module_index_file ),
   { 'CPAN::Mirror::FromGit' => "file:///${FindBin::Bin}/../.git",
     'App::cpanminus::script::withgit' =>
-      'file:////Users/edenc/src/CPAN-Mirror-FromGit/t/../.git'
+      "file:///${FindBin::Bin}/../.git"
   }
 );
 
